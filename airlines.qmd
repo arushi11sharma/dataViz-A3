@@ -1,0 +1,132 @@
+---
+title: "networks: airlines dataset"
+---
+
+
+```{r}
+
+#| label: setup
+#| message: false
+#| code-fold: true
+#| code-summary: "show me the code"
+
+
+library(ggformula)
+library(tidyverse)
+library(igraph) 
+library(tidygraph) 
+library(ggraph) 
+library(graphlayouts) 
+
+
+library(visNetwork) 
+library(igraphdata) 
+library(sand) 
+
+```
+
+```{r}
+
+# Nodes
+
+airline_nodes <- read_csv("../myA3assignment/data/airlines-data/airlines_nodes.csv") %>% 
+
+mutate(Id = Id + 1)
+
+```
+
+```{r}
+
+# edges
+
+airline_edges <- read_csv("../myA3assignment/data/airlines-data/airlines_edges.csv") %>% 
+  
+  mutate(Source = Source + 1, Target = Target +1)
+
+```
+
+```{r}
+
+glimpse(airline_nodes)
+
+```
+
+```{r}
+
+glimpse(airline_edges)
+
+```
+
+checking for missing values 
+
+```{r}
+
+sum(is.na(airline_nodes))
+sum(is.na(airline_edges))
+
+```
+
+
+making a graph object first
+
+```{r}
+
+airline_graph <- tidygraph::tbl_graph(nodes = airline_nodes, ## specifying what the nodes are
+                                edges = airline_edges, ## specifying what the edges are 
+                                directed = FALSE)
+
+airline_graph
+
+```
+
+
+```{r}
+
+airline_graph <- airline_graph %>%
+  activate(nodes) %>%
+  mutate(degree = centrality_degree())
+
+```
+
+
+
+# Connectivity and Airport Traffic
+
+```{r}
+
+set.seed(42)
+
+airline_graph %>%
+  ggraph(layout = "fr") +
+  geom_edge_link0(alpha = 0.25, colour = "grey70") +
+  geom_node_point(aes(size = degree, fill = degree), shape = 21) +
+   geom_node_text(aes(label = Code), size = 2, repel = T) +
+  scale_fill_distiller(palette = "Spectral") +
+  theme_void()
+
+```
+
+In this network, node size represents the number of connections (degree) and colour shows the number of visits. The network has a dense central area with many smaller airports spread around the edges. Airports with higher visit counts are mostly located near the centre and also tend to have more connections. This suggests that busier airports play a more important role in connecting the network.
+
+# Identifying Major Hub Airports
+
+```{r}
+
+set.seed(42)
+
+airline_graph %>%
+  ggraph(layout = "fr") +
+  geom_edge_link0(alpha = 0.25, colour = "grey70") +
+  geom_node_point(aes(size = degree, fill = Visits), shape = 21) +
+  geom_node_text(aes(label = Code), size = 2, repel = T) +
+  scale_fill_distiller(palette = "Spectral") +
+  theme_void()
+
+```
+
+In this visualisation, both node size and colour represent degree centrality. A few airports appear much larger and brighter, showing that they have many connections. Most airports are smaller and located towards the outer areas, meaning they have fewer connections. This shows that the network is dominated by a small number of highly connected airports.
+
+
+## conclusion
+
+Overall, the airline network is concentrated around a few highly connected airports, while most airports have only a small number of connections. These highly connected airports also tend to have higher traffic, showing that network connectivity and airport activity are closely related.

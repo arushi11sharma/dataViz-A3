@@ -1,0 +1,76 @@
+---
+title: "migration"
+---
+
+
+## setup
+
+```{r}
+
+#| label: setup
+library(tidyverse)
+library(ggformula)
+library(sf)
+library(sfheaders) 
+library(osmdata)
+library(sf)
+library(tmap)
+library(ggplot2)
+
+```
+
+
+```{r}
+
+data("World", package = "tmap")
+
+```
+
+```{r}
+
+class(World)
+
+```
+
+
+```{r}
+
+rose_points <- st_read("data/rosefinch/points.shp")
+rose_lines  <- st_read("data/rosefinch/lines.shp")
+
+```
+
+## map 1 - base world map
+
+```{r}
+gf_sf(data = World, fill = "grey90", color = "grey70", size = 0.2) %>%
+  gf_theme(theme = theme_classic())
+```
+This map shows the base world layer used as the reference for the analysis. The World dataset from the tmap package was plotted using gf_sf(). Countries are displayed in light grey with thin boundaries to provide geographic context for the migration data shown in the following maps.
+
+
+## map 2 -  migration routes
+
+```{r}
+gf_sf(data = World, fill = "grey90", color = "grey70", size = 0.2) %>%
+  gf_sf(data = rose_lines, color = "red", size = 0.5, alpha = 0.9) %>%
+  gf_theme(theme = theme_classic())
+
+```
+This map displays the migration routes of the Common Rosefinch using the line shapefile. The red lines represent movement paths connecting recorded locations. These lines show the overall spatial extent and direction of migration patterns at a global scale.
+
+
+## map 3 - observation locations
+
+```{r}
+gf_sf(data = World, fill = "grey90", color = "grey70", size = 0.2) %>%
+  gf_sf(data = rose_points, color = "blue", size = 0.3, alpha = 0.5) %>%
+  gf_theme(theme = theme_classic())
+
+```
+This map shows the recorded observation locations of the Common Rosefinch. Each blue point represents an individual geographic record from the point shapefile. The points illustrate the overall spatial distribution of observations across the study area.
+
+
+## conclusion
+
+Together, the maps present both the individual observation locations and the movement connections between them. The overlap between points and routes indicates consistent migration patterns across the recorded locations.

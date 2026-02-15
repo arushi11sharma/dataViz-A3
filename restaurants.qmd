@@ -1,0 +1,243 @@
+---
+title: "maps: restaurants"
+---
+
+## introduction
+
+# in this assignment i will make a map of my favourite restaurants in bangalore, particularly around MG Road, and colour code them according to the cuisines.
+
+## setup
+
+```{r}
+
+#| label: setup
+library(tidyverse)
+library(ggformula)
+library(sf)
+library(sfheaders) 
+library(osmdata)
+
+```
+
+## getting MG Road data
+
+i will now specify a bounding box to get MG road base map data
+
+## specifying the bounding box
+
+```{r}
+
+# https://boundingbox.klokantech.com CSV:
+# 77.594,12.965753,77.610464,12.979926
+bbox_1 <- matrix(c(77.594, 12.965753, 77.610464, 12.979926), 
+                 byrow = FALSE, 
+                 nrow = 2,
+                 ncol = 2, 
+                 dimnames = list(c("x", "y"), c("min", "max")))
+bbox_1
+
+```
+
+now i will download the roads and buildings inside the bounding box
+
+```{r}
+
+#| label: download-buildings
+#| eval: false
+
+# Get all buildings within my bbox
+
+dat_buildings <-
+  osmdata::opq(bbox = bbox_1) %>% 
+  osmdata::add_osm_feature(key = "building") %>% 
+  osmdata_sf() %>% 
+  purrr::pluck("osm_polygons")
+
+```
+
+```{r}
+
+#| label: download-roads
+#| eval: false
+
+# Get all residential roads within my bbox
+dat_roads <- 
+  osmdata::opq(bbox = bbox_1) %>% 
+  osmdata::add_osm_feature(key = "highway") %>% 
+  osmdata_sf() %>% 
+  purrr::pluck("osm_lines")
+
+```
+
+now i will save the data locally
+
+```{r}
+
+#| eval: false
+
+sf::st_write(dat_buildings,
+             dsn = "../myA3assignment/data/gpkg-data/buildings.gpkg",
+             append = F,
+             quiet = F)
+
+```
+
+```{r}
+
+#| eval: false
+
+sf::st_write(dat_roads,
+             dsn = "../myA3assignment/data/gpkg-data/roads.gpkg",
+             append = F,
+             quiet = F)
+
+```
+
+## reading the saved data
+
+```{r}
+
+buildings <- sf::st_read(dsn = "../myA3assignment/data/gpkg-data/buildings.gpkg")
+
+roads <- sf::st_read(dsn = "../myA3assignment/data/gpkg-data/roads.gpkg")
+
+```
+
+```{r}
+
+glimpse(buildings)
+
+```
+
+```{r}
+
+glimpse(roads)
+
+```
+
+```{r}
+
+gf_sf(data = buildings) %>% gf_sf(data = roads)
+
+```
+
+```{r}
+
+gf_sf(data = buildings, geometry = ~ geom, colour = "grey90") %>% 
+  
+  gf_sf(data = roads, geometry = ~ geom, color = "skyblue") %>% 
+  
+  gf_theme(theme = theme_minimal())
+
+```
+
+## creating the restaurant dataset
+
+```{r}
+
+restaurants <- tibble(
+  name = c(
+    "Homiga",
+    "Amintiri",
+    "Nagarjuna",
+    "Kuuraku",
+    "Sriracha",
+    "The Pizza Bakery",
+    "Sunny's",
+    "Ebony",
+    "Yauatcha",
+    "Lavonne"
+  ),
+  
+  cuisine = c(
+    "Pan-Asian",
+    "Dessert",
+    "South Indian",
+    "Pan-Asian",
+    "Pan-Asian",
+    "Italian",
+    "Italian",
+    "Pan-Asian",
+    "Pan-Asian",
+    "Dessert"
+  ),
+  
+  lon = c(
+    77.60774,
+    77.60730,
+    77.60618,
+    77.60768,
+    77.59589,
+    77.60749,
+    77.59797,
+    77.60583,
+    77.59628,
+    77.60703
+  ),
+  
+  lat = c(
+    12.97362,
+    12.97270,
+    12.96883,
+    12.97355,
+    12.97157,
+    12.97283,
+    12.97118,
+    12.97497,
+    12.97184,
+    12.97399
+  )
+)
+
+restaurants
+
+```
+
+## converting restaurants to sf
+
+```{r}
+
+restaurant_sf <- sfheaders::sf_point(
+  restaurants,
+  x = "lon",
+  y = "lat",
+  keep = TRUE   
+)
+
+# match CRS with buildings
+
+restaurant_sf <- restaurant_sf %>%
+  st_set_crs(st_crs(buildings))
+
+restaurant_sf
+
+```
+
+## renaming the geometry column to match buildings/roads
+
+```{r}
+
+restaurant_sf <- restaurant_sf %>%
+  rename(geom = geometry)
+
+```
+
+## plotting the map
+
+```{r}
+
+gf_sf(data = buildings, geometry = ~ geom, fill = "grey90") %>% 
+  
+  gf_sf(data = roads, geometry = ~ geom, color = "skyblue", size = 0.5) %>% 
+  
+  gf_sf(data = restaurant_sf, geometry = ~ geom, color = ~ cuisine, size = 2.5) %>% 
+  
+  gf_theme(theme = theme_classic())
+```
+
+## conclusion
+
+This map highlights my favourite restaurants around the MG Road area in Bangalore. By colour-coding the locations based on cuisine, the visualization reflects the diversity of dining options available in a relatively small area. The map also shows how this part of the city functions as a dense social and cultural hub, with a mix of different food experiences concentrated around key streets like Church Street and St. Marks Road.
+
+
+

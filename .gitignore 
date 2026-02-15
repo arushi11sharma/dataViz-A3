@@ -1,0 +1,11 @@
+# Ignore large spatial data folders
+data/storks/
+data/cranes/
+data/rosefinch/
+
+# Ignore shapefile components
+*.shp
+*.dbf
+*.shx
+*.prj
+*.fix

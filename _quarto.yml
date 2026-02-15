@@ -1,0 +1,23 @@
+project:
+  type: website
+
+website:
+  title: "A3 Data Visualisation"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: airlines.qmd
+        text: Airline Network
+      - href: karate_club.qmd
+        text: Karate Club
+      - href: restaurants.qmd
+        text: Restaurants Map
+      - href: migration_new.qmd
+        text: Bird Migration
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+

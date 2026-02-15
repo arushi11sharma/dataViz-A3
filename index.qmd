@@ -1,0 +1,40 @@
+---
+title: "myA3assignment"
+---
+
+## Welcome
+
+This website presents a collection of my data visualisation projects created for the A3 assignment. Each project explores a different dataset and uses visual methods to communicate patterns, relationships, and insights.
+
+Use the links below to navigate to any project you would like to explore.
+
+---
+
+## Projects
+
+### 1. Airline Network Analysis
+This project explores airline connectivity using network visualization techniques. Airports are represented as nodes and flight routes as edges, allowing the structure of the airline network to be examined. The visualization highlights major hubs, connectivity patterns, and the overall structure of air travel networks.
+
+[View Project](airlines.qmd)
+
+---
+
+### 2. Zachary Karate Club Network
+This project visualizes the Zachary Karate Club dataset to study social network structure. The network represents relationships between members and illustrates community formation, group splits, and central individuals. The visualization demonstrates key network concepts such as clusters, centrality, and social structure.
+
+[View Project](karate_club.qmd)
+
+---
+
+### 3. Favourite Restaurants around MG Road
+An interactive spatial visualization of my favourite restaurants in the MG Road area of Bangalore. The locations are mapped using OpenStreetMap data and colour-coded by cuisine to show the diversity of food options in this urban hub.
+
+[View Project](restaurants.qmd)
+
+---
+
+### 4.  Bird Migration Map
+This project visualizes the migration patterns of a rosefinch bird species using movement data downloaded from Movebank.
+
+[View Project](migration_new.qmd)
+

@@ -1,0 +1,85 @@
+---
+title: "karate club dataset"
+---
+
+
+## setup:
+
+```{r}
+#| label: setup
+#| message: false
+#| code-fold: true
+#| code-summary: "show me the code"
+
+library(ggformula)
+library(tidyverse)
+library(igraph) # Network Analysis Library (Handle data and Viz)
+library(tidygraph) # For Network "Manipulation"
+library(ggraph) # For Network Visualization
+library(graphlayouts) # For Network Visualization, more layouts and themes
+
+
+library(visNetwork) # For Interactive Network Visualization
+library(igraphdata) # For "Network" Datasets
+library(sand) # Statistical Analysis of Networks Data 
+
+```
+
+```{r}
+
+data("karate")
+karate
+
+```
+
+```{r}
+glimpse(karate)
+```
+
+## plotting directly with ggraph
+
+```{r}
+
+set.seed(42)
+
+ggraph(karate, layout = "fr") +
+  geom_edge_link(alpha = 0.3, colour = "grey70") +
+  geom_node_point(size = 4, shape = 21, fill = "steelblue") +
+  theme_void()
+
+```
+
+This network shows the overall structure of relationships within the karate club. The layout reveals two main clusters of members connected by a few central individuals. Some members are located at the centre with many connections, while others are positioned on the edges with only a few links. This suggests that interactions in the club are not evenly distributed and depend on a few key members.
+
+## adding degree centrality
+
+```{r}
+
+karate_graph <- as_tbl_graph(karate) %>%
+  activate(nodes) %>%
+  mutate(degree = centrality_degree())
+
+```
+
+plotting the graph
+
+```{r}
+
+set.seed(42)
+
+karate_graph %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(alpha = 0.3, colour = "grey70") +
+  geom_node_point(aes(size = degree, fill = degree),
+                  shape = 21) +
+  scale_fill_distiller(palette = "Spectral") +
+  theme_void()
+
+```
+
+In this visualisation, node size and colour represent degree centrality. A small number of members appear larger and brighter, indicating that they have many connections and play a more central role in the network. Most members are smaller and located towards the outside, meaning they interact with fewer people. This shows that the club’s social structure is influenced by a few highly connected individuals.
+
+
+## conclusion
+
+Overall, the karate club network shows that relationships are concentrated around a few central members, and the network naturally forms two groups. This suggests that social interactions within the club are shaped both by key individuals and by divisions between member groups.
